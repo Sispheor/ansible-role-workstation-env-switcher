@@ -1,0 +1,67 @@
+- debug:
+    msg: "Enable proxy"
+
+- name: Configure proxy settings in /etc/environment
+  blockinfile:
+    dest: /etc/environment
+    create: yes
+    mode: u=rw,g=r,o=r
+    marker: "{{ wes_template_maker }}"
+    block: |
+      {% if environments[env]["proxy"]["config"]["http_proxy"] is defined %}
+      http_proxy="{{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+      HTTP_PROXY="{{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["ftp_proxy"] is defined %}
+      ftp_proxy="{{ environments[env]["proxy"]["config"]["ftp_proxy"] }}"
+      FTP_PROXY="{{ environments[env]["proxy"]["config"]["ftp_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["https_proxy"] is defined %}
+      https_proxy="{{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+      HTTPS_PROXY="{{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["no_proxy"] is defined %}
+      no_proxy="{{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+      NO_PROXY="{{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+      {% endif %}
+  tags: proxy
+  when: "'environment' in environments[env]['proxy']['services']"
+
+
+- name: Configure proxy settings for apt-get/aptitude
+  template:
+    src: 30proxy.j2
+    dest: "{{ wes_apt_proxy_config_file_path }}"
+    mode: u=rw,g=r,o=r
+  tags: proxy
+  when: "'apt' in environments[env]['proxy']['services']"
+
+- name: Configure proxy settings for docker
+  template:
+    src: docker-proxy.j2
+    dest: "{{ wes_docker_proxy_config_file_path }}"
+    mode: u=rw,g=r,o=r
+  tags: proxy
+  when: "'docker' in environments[env]['proxy']['services']"
+  notify: restart docker
+
+- name: Configure proxy settings in gnome
+  when: "'gnome' in environments[env]['proxy']['services']"
+  become: False
+  block:
+
+    - name: Get proxy host and port
+      set_fact:
+        proxy_host: "{{ environments[env]['proxy']['config']['http_proxy'] | urlsplit('hostname') }}"
+        proxy_port: "{{ environments[env]['proxy']['config']['http_proxy'] | urlsplit('port') }}"
+        no_proxy: "{{ environments[env]['proxy']['config']['no_proxy'].split(',') }}"
+
+    - name: Configure HTTP proxy
+      shell: |
+        gsettings set org.gnome.system.proxy mode 'manual'
+        gsettings set org.gnome.system.proxy.http enabled true
+        gsettings set org.gnome.system.proxy.http host {{ proxy_host }}
+        gsettings set org.gnome.system.proxy.http port {{ proxy_port }}
+        gsettings set org.gnome.system.proxy.https host {{ proxy_host }}
+        gsettings set org.gnome.system.proxy.https port {{ proxy_port }}
+        gsettings set org.gnome.system.proxy ignore-hosts "[{% for no_proxy_item in no_proxy %}'{{ no_proxy_item }}'{% if not loop.last %}, {% endif %}{% endfor %}]"

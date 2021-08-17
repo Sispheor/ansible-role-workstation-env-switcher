@@ -1,0 +1,11 @@
+---
+
+- fail:
+    msg: "Target env name '{{ env }}' not present in variables"
+  when: env not in environments
+
+- debug:
+    msg: "Switching to environment name '{{ env }}'"
+
+- include: "proxy/proxy.yml"
+  when: "'proxy' in environments[env]"

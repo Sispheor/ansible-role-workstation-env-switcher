@@ -1,0 +1,13 @@
+[Service]
+{% if environments[env]["proxy"]["config"]["http_proxy"] is defined %}
+Environment="HTTP_PROXY={{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+Environment="http_proxy={{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+{% endif %}
+{% if environments[env]["proxy"]["config"]["https_proxy"] is defined %}
+Environment="HTTPS_PROXY={{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+Environment="https_proxy={{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+{% endif %}
+{% if environments[env]["proxy"]["config"]["no_proxy"] is defined %}
+Environment="NO_PROXY={{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+Environment="no_proxy={{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+{% endif %}

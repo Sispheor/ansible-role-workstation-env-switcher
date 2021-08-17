@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-role-workstation-env-switcher
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted

@@ -1,0 +1,43 @@
+# ansible-playbook-4 tests/test.yml -e "env=hpe"
+
+---
+- hosts: localhost
+  connection: local
+  become: True
+
+  vars:
+    environments:
+      hpe:
+        proxy:
+          enabled: True
+          config:
+            http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+            https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+            no_proxy: localhost,127.0.0.1,::1,hpecorp.net,c4lab.local
+          services:
+            - environment
+            - apt
+            - docker
+            - gnome
+        dns:
+          enabled: True
+          config:
+            search: corporate.domain.com
+            nameserver: 1.2.3.4
+          services:
+            - docker # /etc/docker/daemon.json
+      home:
+        proxy:
+          enabled: False
+          services: # we need to declare services anyway so we can check that the proxy config is not applied
+            - environment
+            - apt
+            - docker
+            - gnome
+        dns:
+          enabled: True
+          config:
+            nameserver: 8.8.8.8
+
+  roles:
+    - ansible-role-workstation-env-switcher

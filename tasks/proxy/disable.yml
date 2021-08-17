@@ -1,0 +1,27 @@
+- debug:
+    msg: "Disable proxy"
+
+- name: Remove proxy settings in /etc/environment
+  blockinfile:
+    path: /etc/environment
+    marker: "{{ wes_template_maker }}"
+    block: ""
+  when: "'environment' in environments[env]['proxy']['services']"
+
+- name: Remove apt proxy config
+  ansible.builtin.file:
+    path: "{{ wes_apt_proxy_config_file_path }}"
+    state: absent
+  when: "'apt' in environments[env]['proxy']['services']"
+
+- name: Remove Docker proxy config
+  ansible.builtin.file:
+    path: "{{ wes_docker_proxy_config_file_path }}"
+    state: absent
+  notify: restart docker
+  when: "'docker' in environments[env]['proxy']['services']"
+
+- name: Remove proxy config from gnome settings
+  shell: |
+    gsettings set org.gnome.system.proxy mode 'none'
+  when: "'gnome' in environments[env]['proxy']['services']"

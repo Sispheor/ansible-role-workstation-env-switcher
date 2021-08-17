@@ -1,0 +1,12 @@
+#
+# {{ ansible_managed }}
+#
+{% if environments[env]["proxy"]["config"]["http_proxy"] is defined %}
+Acquire::http::proxy "{{ environments[env]["proxy"]["config"]["http_proxy"] }}";
+{% endif %}
+{% if environments[env]["proxy"]["config"]["ftp_proxy"] is defined %}
+Acquire::ftp::proxy "{{ environments[env]["proxy"]["config"]["ftp_proxy"] }}";
+{% endif %}
+{% if environments[env]["proxy"]["config"]["https_proxy"] is defined %}
+Acquire::https::proxy "{{ environments[env]["proxy"]["config"]["https_proxy"] }}";
+{% endif %}
