@@ -5,3 +5,4 @@ wes_template_maker: "# {mark} ANSIBLE ROLE WORKSTATION ENV SWITCHER"
 
 wes_apt_proxy_config_file_path: /etc/apt/apt.conf.d/30proxy
 wes_docker_proxy_config_file_path: /etc/systemd/system/docker.service.d/http-proxy.conf
+wes_docker_json_config: ~/.docker/config.json

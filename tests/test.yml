@@ -13,7 +13,7 @@
           config:
             http_proxy: http://web-proxy.bbn.hpecorp.net:8080
             https_proxy: http://web-proxy.bbn.hpecorp.net:8080
-            no_proxy: localhost,127.0.0.1,::1,hpecorp.net,c4lab.local
+            no_proxy: localhost,127.0.0.1,::1,hpecorp.net,c4lab.local,30.0.0.0/8
           services:
             - environment
             - apt
@@ -22,8 +22,8 @@
         dns:
           enabled: True
           config:
-            search: corporate.domain.com
-            nameserver: 1.2.3.4
+            search: gre.hpecorp.net
+            nameserver: 16.110.135.52
           services:
             - docker # /etc/docker/daemon.json
       home:
@@ -37,7 +37,7 @@
         dns:
           enabled: True
           config:
-            nameserver: 8.8.8.8
+            nameserver: 1.1.1.1
 
   roles:
     - ansible-role-workstation-env-switcher

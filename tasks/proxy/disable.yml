@@ -14,12 +14,30 @@
     state: absent
   when: "'apt' in environments[env]['proxy']['services']"
 
-- name: Remove Docker proxy config
-  ansible.builtin.file:
-    path: "{{ wes_docker_proxy_config_file_path }}"
-    state: absent
-  notify: restart docker
+- name: Docker block
   when: "'docker' in environments[env]['proxy']['services']"
+  block:
+    - name: Remove Docker proxy config from systemd
+      ansible.builtin.file:
+        path: "{{ wes_docker_proxy_config_file_path }}"
+        state: absent
+      notify: restart docker
+
+    - name: Get current docker config ~/.docker/config.json
+      set_fact:
+        docker_config_json: "{{ lookup('file', wes_docker_json_config) | from_json }}"
+
+    - set_fact:
+        docker_config_json_updated: "{{ docker_config_json_updated|default({}) |combine({item.key: item.value}) }}"
+      when: "{{ item.key not in ['proxies'] }}"
+      with_dict: "{{ docker_config_json }}"
+
+    - name: Replace docker config ~/.docker/config.json with new config
+      become: False
+      copy:
+        content: "{{ docker_config_json_updated | to_json }}"
+        dest: "{{ wes_docker_json_config }}"
+      notify: restart docker
 
 - name: Remove proxy config from gnome settings
   shell: |
