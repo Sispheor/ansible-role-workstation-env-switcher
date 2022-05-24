@@ -1,0 +1,5 @@
+- name: Remove proxy settings in /etc/environment
+  blockinfile:
+    path: /etc/environment
+    marker: "{{ wes_template_maker }}"
+    block: ""

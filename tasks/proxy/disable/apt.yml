@@ -1,0 +1,4 @@
+- name: Remove apt proxy config
+  ansible.builtin.file:
+    path: "{{ wes_apt_proxy_config_file_path }}"
+    state: absent

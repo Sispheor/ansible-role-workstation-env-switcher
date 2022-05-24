@@ -1,0 +1,33 @@
+- name: Configure proxy settings for docker in systemd
+  template:
+    src: docker-proxy.systemd.j2
+    dest: "{{ wes_docker_proxy_config_file_path }}"
+    mode: u=rw,g=r,o=r
+  tags: proxy
+  notify: restart docker
+
+- name: Get current docker config ~/.docker/config.json
+  set_fact:
+    docker_config_json: "{{ lookup('file', wes_docker_json_config) | from_json }}"
+
+- name: Prepare a dict with the docker proxy config
+  set_fact:
+    docker_proxy_json_config:
+      default:
+        httpProxy: "{{ environments[env]['proxy']['config']['http_proxy'] }}"
+        httpsProxy: "{{ environments[env]['proxy']['config']['http_proxy'] }}"
+        noProxy: "{{ environments[env]['proxy']['config']['no_proxy'] }}"
+
+- name: Override docker config with proxy settings
+  set_fact:
+    docker_config_json: "{{ docker_config_json | combine({ 'proxies': docker_proxy_json_config }) }}"
+
+- debug:
+    var: "docker_config_json"
+
+- name: Replace docker config ~/.docker/config.json with new config
+  become: false
+  copy:
+    content: "{{ docker_config_json | to_json }}"
+    dest: "{{ wes_docker_json_config }}"
+  notify: restart docker

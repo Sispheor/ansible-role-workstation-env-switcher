@@ -1,8 +1,10 @@
 - debug:
     msg: "Configure proxy"
 
-- include: enable.yml
-  when: environments[env]["proxy"]["enabled"]
+- when: environments[env]["proxy"]["enabled"]
+  include: "enable/{{ item }}.yml"
+  loop: "{{ environments[env]['proxy']['services'] }}"
 
-- include: disable.yml
-  when: not environments[env]["proxy"]["enabled"]
+- when: not environments[env]["proxy"]["enabled"]
+  include: "disable/{{ item }}.yml"
+  loop: "{{ environments[env]['proxy']['services'] }}"

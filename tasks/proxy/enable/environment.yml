@@ -1,0 +1,24 @@
+- name: Configure proxy settings in /etc/environment
+  blockinfile:
+    dest: /etc/environment
+    create: yes
+    mode: u=rw,g=r,o=r
+    marker: "{{ wes_template_maker }}"
+    block: |
+      {% if environments[env]["proxy"]["config"]["http_proxy"] is defined %}
+      http_proxy="{{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+      HTTP_PROXY="{{ environments[env]["proxy"]["config"]["http_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["ftp_proxy"] is defined %}
+      ftp_proxy="{{ environments[env]["proxy"]["config"]["ftp_proxy"] }}"
+      FTP_PROXY="{{ environments[env]["proxy"]["config"]["ftp_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["https_proxy"] is defined %}
+      https_proxy="{{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+      HTTPS_PROXY="{{ environments[env]["proxy"]["config"]["https_proxy"] }}"
+      {% endif %}
+      {% if environments[env]["proxy"]["config"]["no_proxy"] is defined %}
+      no_proxy="{{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+      NO_PROXY="{{ environments[env]["proxy"]["config"]["no_proxy"] }}"
+      {% endif %}
+  tags: proxy

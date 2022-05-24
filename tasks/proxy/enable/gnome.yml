@@ -1,0 +1,15 @@
+- name: Get proxy host and port
+  set_fact:
+    proxy_host: "{{ environments[env]['proxy']['config']['http_proxy'] | urlsplit('hostname') }}"
+    proxy_port: "{{ environments[env]['proxy']['config']['http_proxy'] | urlsplit('port') }}"
+    no_proxy: "{{ environments[env]['proxy']['config']['no_proxy'].split(',') }}"
+
+- name: Configure HTTP proxy
+  shell: |
+    gsettings set org.gnome.system.proxy mode 'manual'
+    gsettings set org.gnome.system.proxy.http enabled true
+    gsettings set org.gnome.system.proxy.http host {{ proxy_host }}
+    gsettings set org.gnome.system.proxy.http port {{ proxy_port }}
+    gsettings set org.gnome.system.proxy.https host {{ proxy_host }}
+    gsettings set org.gnome.system.proxy.https port {{ proxy_port }}
+    gsettings set org.gnome.system.proxy ignore-hosts "[{% for no_proxy_item in no_proxy %}'{{ no_proxy_item }}'{% if not loop.last %}, {% endif %}{% endfor %}]"

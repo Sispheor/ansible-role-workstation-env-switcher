@@ -1,0 +1,6 @@
+- name: Configure proxy settings for apt-get/aptitude
+  template:
+    src: 30proxy.j2
+    dest: "{{ wes_apt_proxy_config_file_path }}"
+    mode: u=rw,g=r,o=r
+  tags: proxy
