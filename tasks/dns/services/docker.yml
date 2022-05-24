@@ -1,0 +1,23 @@
+- debug:
+    msg: "Configure DNS in Docker"
+
+- name: Get current docker config in /etc/docker/daemon.json
+  set_fact:
+    docker_config_json: "{{ lookup('file', docker_config_path) | from_json }}"
+
+- name: Prepare a dict with the docker DNS config
+  set_fact:
+    docker_dns_json_config: "{{ environments[env]['dns']['config']['nameserver'] }}"
+
+- name: Override docker config with proxy settings
+  set_fact:
+    docker_config_json: "{{ docker_config_json | combine({ 'dns': docker_dns_json_config }) }}"
+
+- debug:
+    var: "docker_config_json"
+
+- name: Replace docker config /etc/docker/daemon.json with new config
+  copy:
+    content: "{{ docker_config_json | to_json }}"
+    dest: "{{ docker_config_path }}"
+  notify: restart docker

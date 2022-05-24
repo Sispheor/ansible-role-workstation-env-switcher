@@ -9,3 +9,6 @@
 
 - include: "proxy/proxy.yml"
   when: "'proxy' in environments[env]"
+
+- include: "dns/dns.yml"
+  when: "'dns' in environments[env]"

@@ -1,0 +1,5 @@
+- debug:
+    msg: "Configure DNS"
+
+- include: "services/{{ item }}.yml"
+  loop: "{{ environments[env]['dns']['services'] }}"

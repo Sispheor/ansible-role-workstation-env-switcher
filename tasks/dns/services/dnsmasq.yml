@@ -1,0 +1,9 @@
+- debug:
+    msg: "Configure DNS in dnsmasq"
+
+- name: Update server in dnsmasq_config_path
+  ansible.builtin.lineinfile:
+    path: "{{ dnsmasq_config_path }}"
+    regexp: '^server='
+    line: "server={{ environments[env]['dns']['config']['nameserver'][0] }}"
+  notify: restart dnsmasq

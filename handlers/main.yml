@@ -4,3 +4,8 @@
   ansible.builtin.service:
     name: docker
     state: restarted
+
+- name: restart dnsmasq
+  ansible.builtin.service:
+    name: dnsmasq
+    state: restarted

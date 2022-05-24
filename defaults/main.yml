@@ -1,2 +1,8 @@
 ---
 # defaults file for ansible-role-workstation-env-switcher
+
+# dnsmsq
+dnsmasq_config_path: /etc/dnsmasq.d/ubuntu
+
+# docker
+docker_config_path: /etc/docker/daemon.json

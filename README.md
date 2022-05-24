@@ -14,6 +14,10 @@ Supported configurations:
   - docker
   - gnome
 
+- dns:
+  - dnsmasq
+  - docker
+
 
 ## Requirements
 
@@ -46,6 +50,13 @@ TODO
             - apt
             - docker
             - gnome
+        dns:
+          config:
+            nameserver:
+              - 1.1.1.1
+          services:
+            - dnsmasq
+            - docker
       home:
         proxy:
           enabled: False
@@ -54,15 +65,21 @@ TODO
             - apt
             - docker
             - gnome
+        dns:
+          config:
+            nameserver:
+              - 16.110.135.52
+          services:
+            - dnsmasq
+            - docker
 
   roles:
     - ansible-role-workstation-env-switcher
-
 ```
 
-## TODO
-
-Support DNS config in resolv.conf, docker,...
+```
+ansible-playbook -v playbook.yml -K -e "env=home"
+```
 
 ## License
 

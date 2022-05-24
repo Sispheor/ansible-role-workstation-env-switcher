@@ -27,6 +27,10 @@
       set_fact:
         docker_config_json: "{{ lookup('file', wes_docker_json_config) | from_json }}"
 
+    - name: Create empty default Docker config
+      set_fact:
+        docker_config_json_updated: {}
+
     - set_fact:
         docker_config_json_updated: "{{ docker_config_json_updated|default({}) |combine({item.key: item.value}) }}"
       when: "{{ item.key not in ['proxies'] }}"
